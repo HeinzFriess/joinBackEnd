@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
 from tickets.models import Ticket, Category, Priority, State
-from tickets.serializers import TicketSerializer, CategorySerializer, StateSerializer
+from tickets.serializers import TicketSerializer, CategorySerializer, StateSerializer, PrioritySerializer
 
 class TicketView(APIView):
     
@@ -34,7 +34,6 @@ class TicketView(APIView):
             'maintask': request.data.get('maintask'),
             'assigned': request.data.get('assigned'),
             'date': request.data.get('date'),
-            'created_at': request.data.get('created_at'),
             'author' : request.user.id
         }
         serializer = TicketSerializer(data=data)
@@ -51,9 +50,9 @@ class CategoryView(APIView):
 
     def get(self, request, format=None):
         """
-        Return a list of the Category.
+        Return a list of the Categories.
         """
-        todos = Category.objects.filter(author=request.user) 
+        todos = Category.objects.all()  
         serializer = CategorySerializer(todos, many=True)
         return Response(serializer.data)
     
@@ -71,6 +70,59 @@ class CategoryView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class PriorityView(APIView):
+    
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        """
+        Return a list of the Priorities.
+        """
+        todos = Priority.objects.all() 
+        serializer = PrioritySerializer(todos, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request, *args, **kwargs):
+        '''
+        Create the Priority with given data
+        '''
+        data = {
+            'name': request.data.get('name')
+        }
+        serializer = PrioritySerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class StateView(APIView):
+    
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        """
+        Return a list of the States.
+        """
+        todos = State.objects.all() 
+        serializer = StateSerializer(todos, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request, *args, **kwargs):
+        '''
+        Create the Priority with given data
+        '''
+        data = {
+            'name': request.data.get('name')
+        }
+        serializer = StateSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class loginview(ObtainAuthToken):
     
