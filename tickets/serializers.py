@@ -7,7 +7,7 @@ from tickets.models import Ticket, Category, State, Priority
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'email']
+        fields = ['url', 'username', 'email', 'id']
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -34,3 +34,9 @@ class PrioritySerializer(serializers.ModelSerializer):
     class Meta:
         model = Priority
         fields = '__all__'
+
+
+class UsersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']

@@ -26,7 +26,7 @@ class Ticket(models.Model):
     status = models.ForeignKey(State,on_delete=models.CASCADE)
     maintask = models.BooleanField(default=False)
     assigned = models.CharField(max_length=100)
-    date = models.BigIntegerField()
+    date = models.DateField(default=datetime.date.today)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

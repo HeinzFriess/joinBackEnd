@@ -4,9 +4,10 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from django.contrib.auth.models import User
 
 from tickets.models import Ticket, Category, Priority, State
-from tickets.serializers import TicketSerializer, CategorySerializer, StateSerializer, PrioritySerializer
+from tickets.serializers import TicketSerializer, CategorySerializer, StateSerializer, PrioritySerializer, UsersSerializer
 
 class TicketView(APIView):
     
@@ -137,3 +138,22 @@ class loginview(ObtainAuthToken):
              'user_id': user.pk,
              'email': user.email
             })
+    
+class UserView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    # def get(self, request, format=None):
+    #     """
+    #     Return a list of all users.
+    #     """
+    #     usernames = [user.username for user in User.objects.all()]
+    #     return Response(User.objects.all())
+    
+    def get(self, request, format=None):
+        """
+        Return a list of all users.
+        """
+        users = User.objects.all() 
+        serializer = UsersSerializer(users, many=True)
+        return Response(serializer.data)
