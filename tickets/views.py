@@ -18,8 +18,8 @@ class TicketView(APIView):
         """
         Return a list of the tickets.
         """
-        todos = Ticket.objects.filter(author=request.user) 
-        serializer = TicketSerializer(todos, many=True)
+        tickets = Ticket.objects.filter(author=request.user) 
+        serializer = TicketSerializer(tickets, many=True)
         return Response(serializer.data)
     
     def post(self, request, *args, **kwargs):
@@ -43,6 +43,46 @@ class TicketView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TicketDetailView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, ticket_id):
+        '''
+        Helper method to get the object with given todo_id, and user_id
+        '''
+        try:
+            return Ticket.objects.get(id=ticket_id)
+        except Ticket.DoesNotExist:
+            return None
+        
+    def put(self, request, ticket_id, *args, **kwargs):
+        '''
+        Updates the ticket item with given ticket_id if exists
+        '''
+        ticket_instance = self.get_object(ticket_id)
+        if not ticket_instance:
+            return Response(
+                {"res": "Object with ticket id does not exists"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        data = {
+            "title": request.data.get('title'),
+            "description": request.data.get('description'),
+            "maintask": request.data.get('maintask'),
+            "assigned": request.data.get('assigned'),
+            "date": request.data.get('date'),
+            "category": request.data.get('category'),
+            "priority": request.data.get('priority'),
+            "status": request.data.get('status')
+        }
+        serializer = TicketSerializer(instance = ticket_instance, data=data, partial = True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CategoryView(APIView):
     
