@@ -2,12 +2,12 @@ from rest_framework.authtoken.views import ObtainAuthToken, APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from django.contrib.auth.models import User
-
+from rest_framework import generics
 from tickets.models import Ticket, Category, Priority, State
-from tickets.serializers import TicketSerializer, CategorySerializer, StateSerializer, PrioritySerializer, UsersSerializer
+from tickets.serializers import TicketSerializer, CategorySerializer, StateSerializer, PrioritySerializer, UsersSerializer, SignupSerializer
 
 class TicketView(APIView):
     
@@ -179,17 +179,15 @@ class loginview(ObtainAuthToken):
              'email': user.email
             })
     
+class signupview(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = SignupSerializer    
+    
 class UserView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    # def get(self, request, format=None):
-    #     """
-    #     Return a list of all users.
-    #     """
-    #     usernames = [user.username for user in User.objects.all()]
-    #     return Response(User.objects.all())
-    
     def get(self, request, format=None):
         """
         Return a list of all users.
