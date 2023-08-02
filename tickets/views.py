@@ -9,8 +9,9 @@ from rest_framework import generics
 from tickets.models import Ticket, Category, Priority, State
 from tickets.serializers import TicketSerializer, CategorySerializer, StateSerializer, PrioritySerializer, UsersSerializer, SignupSerializer
 
+
 class TicketView(APIView):
-    
+
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -18,10 +19,10 @@ class TicketView(APIView):
         """
         Return a list of the tickets.
         """
-        tickets = Ticket.objects.filter(author=request.user) 
+        tickets = Ticket.objects#.filter(author=request.user)
         serializer = TicketSerializer(tickets, many=True)
         return Response(serializer.data)
-    
+
     def post(self, request, *args, **kwargs):
         '''
         Create the ticket with given data
@@ -35,7 +36,7 @@ class TicketView(APIView):
             'maintask': request.data.get('maintask'),
             'assigned': request.data.get('assigned'),
             'date': request.data.get('date'),
-            'author' : request.user.id
+            'author': request.user.id
         }
         serializer = TicketSerializer(data=data)
         if serializer.is_valid():
@@ -43,6 +44,7 @@ class TicketView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class TicketDetailView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -56,7 +58,7 @@ class TicketDetailView(APIView):
             return Ticket.objects.get(id=ticket_id)
         except Ticket.DoesNotExist:
             return None
-        
+
     def put(self, request, ticket_id, *args, **kwargs):
         '''
         Updates the ticket item with given ticket_id if exists
@@ -64,7 +66,7 @@ class TicketDetailView(APIView):
         ticket_instance = self.get_object(ticket_id)
         if not ticket_instance:
             return Response(
-                {"res": "Object with ticket id does not exists"}, 
+                {"res": "Object with ticket id does not exists"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         data = {
@@ -77,7 +79,8 @@ class TicketDetailView(APIView):
             "priority": request.data.get('priority'),
             "status": request.data.get('status')
         }
-        serializer = TicketSerializer(instance = ticket_instance, data=data, partial = True)
+        serializer = TicketSerializer(
+            instance=ticket_instance, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -85,7 +88,7 @@ class TicketDetailView(APIView):
 
 
 class CategoryView(APIView):
-    
+
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -93,10 +96,10 @@ class CategoryView(APIView):
         """
         Return a list of the Categories.
         """
-        todos = Category.objects.all()  
+        todos = Category.objects.all()
         serializer = CategorySerializer(todos, many=True)
         return Response(serializer.data)
-    
+
     def post(self, request, *args, **kwargs):
         '''
         Create the Category with given data
@@ -111,8 +114,9 @@ class CategoryView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class PriorityView(APIView):
-    
+
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -120,10 +124,10 @@ class PriorityView(APIView):
         """
         Return a list of the Priorities.
         """
-        todos = Priority.objects.all() 
+        todos = Priority.objects.all()
         serializer = PrioritySerializer(todos, many=True)
         return Response(serializer.data)
-    
+
     def post(self, request, *args, **kwargs):
         '''
         Create the Priority with given data
@@ -137,9 +141,10 @@ class PriorityView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class StateView(APIView):
-    
+
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -147,10 +152,10 @@ class StateView(APIView):
         """
         Return a list of the States.
         """
-        todos = State.objects.all() 
+        todos = State.objects.all()
         serializer = StateSerializer(todos, many=True)
         return Response(serializer.data)
-    
+
     def post(self, request, *args, **kwargs):
         '''
         Create the Priority with given data
@@ -165,25 +170,27 @@ class StateView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class loginview(ObtainAuthToken):
-    
-    def post(self, request): #, *args, **kwargs):
+
+    def post(self, request):  # , *args, **kwargs):
         serializer = self.serializer_class(data=request.data,
-                    context={'request': request})
+                                           context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         return Response({
-             'token': token.key,
-             'user_id': user.pk,
-             'email': user.email
-            })
-    
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email
+        })
+
+
 class signupview(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [AllowAny]
-    serializer_class = SignupSerializer    
-    
+    serializer_class = SignupSerializer
+
 class UserView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -192,6 +199,6 @@ class UserView(APIView):
         """
         Return a list of all users.
         """
-        users = User.objects.all() 
+        users = User.objects.all()
         serializer = UsersSerializer(users, many=True)
         return Response(serializer.data)
