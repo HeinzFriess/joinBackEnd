@@ -7,7 +7,8 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework import generics
 from tickets.models import Ticket, Category, Priority, State
-from tickets.serializers import TicketSerializer, CategorySerializer, StateSerializer, PrioritySerializer, UsersSerializer, SignupSerializer
+from tickets.serializers import TicketSerializer, CategorySerializer, StateSerializer, PrioritySerializer, UsersSerializer, SignupSerializer, UsersEditSerializer
+
 
 
 class TicketView(APIView):
@@ -202,3 +203,40 @@ class UserView(APIView):
         users = User.objects.all()
         serializer = UsersSerializer(users, many=True)
         return Response(serializer.data)
+
+class UserDetailView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, user_id):
+        '''
+        Helper method to get the object with given user_id
+        '''
+        try:
+            return User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return None
+
+    def put(self, request, user_id, *args, **kwargs):
+        '''
+        Updates the ticket item with given user_id if exists
+        '''
+        user_instance = self.get_object(user_id)
+        if not user_instance:
+            return Response(
+                {"res": "User with ticket id does not exists"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        data = {
+            #"id": request.data.get('id'),
+            "username": request.data.get('username'),
+            "first_name": request.data.get('first_name'),
+            "last_name": request.data.get('last_name'),
+            #"email": request.data.get('email')
+        }
+        serializer = UsersEditSerializer(
+            instance=user_instance, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

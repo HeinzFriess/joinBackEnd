@@ -42,6 +42,11 @@ class UsersSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
+class UsersEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
+        read_only_fields = ['id', 'email']
 
 class SignupSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
