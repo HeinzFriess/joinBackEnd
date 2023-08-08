@@ -203,6 +203,23 @@ class UserView(APIView):
         users = User.objects.all()
         serializer = UsersSerializer(users, many=True)
         return Response(serializer.data)
+    
+    def post(self, request, *args, **kwargs):  # , *args, **kwargs):
+        data = {
+            'username': request.data.get('username'),
+            'first_name': request.data.get('first_name'),
+            'last_name': request.data.get('last_name'),
+            'email': request.data.get('email')
+        }
+        serializer = UsersSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        #user = serializer
+        token, created = Token.objects.get_or_create(user=serializer) # user=user
+        return Response({
+            'token': token.key,
+            'user_id': serializer.pk, #user.pk
+            'email': serializer.email #user.email
+        })
 
 class UserDetailView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -232,7 +249,7 @@ class UserDetailView(APIView):
             "username": request.data.get('username'),
             "first_name": request.data.get('first_name'),
             "last_name": request.data.get('last_name'),
-            #"email": request.data.get('email')
+            "email": request.data.get('email')
         }
         serializer = UsersEditSerializer(
             instance=user_instance, data=data, partial=True)
