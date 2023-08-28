@@ -2,6 +2,7 @@ import datetime
 from django.conf import settings
 from django.db import models
 
+
 # Create your models here.
 
 class Category(models.Model):
@@ -25,6 +26,7 @@ class Ticket(models.Model):
     priority = models.ForeignKey(Priority,on_delete=models.CASCADE)
     status = models.ForeignKey(State,on_delete=models.CASCADE)
     maintask = models.BooleanField(default=False)
+    subtasks = models.TextField(blank=True)
     assigned = models.CharField(max_length=100)
     date = models.DateField(default=datetime.date.today)
     author = models.ForeignKey(

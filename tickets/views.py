@@ -7,7 +7,7 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework import generics
 from tickets.models import Ticket, Category, Priority, State
-from tickets.serializers import TicketSerializer, CategorySerializer, StateSerializer, PrioritySerializer, UsersSerializer, SignupSerializer, UsersEditSerializer
+from tickets.serializers import TicketSerializer, CategorySerializer, StateSerializer, UsersSerializer, PrioritySerializer, SignupSerializer, UsersEditSerializer
 
 
 
@@ -35,6 +35,7 @@ class TicketView(APIView):
             'priority': request.data.get('priority'),
             'status': request.data.get('status'),
             'maintask': request.data.get('maintask'),
+            'subtasks': request.data.get('subtasks'),
             'assigned': request.data.get('assigned'),
             'date': request.data.get('date'),
             'author': request.user.id
@@ -74,6 +75,7 @@ class TicketDetailView(APIView):
             "title": request.data.get('title'),
             "description": request.data.get('description'),
             "maintask": request.data.get('maintask'),
+            "subtasks": request.data.get('subtasks'),
             "assigned": request.data.get('assigned'),
             "date": request.data.get('date'),
             "category": request.data.get('category'),
@@ -188,6 +190,11 @@ class loginview(ObtainAuthToken):
 
 
 class signupview(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = SignupSerializer
+
+class adduserview(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [AllowAny]
     serializer_class = SignupSerializer

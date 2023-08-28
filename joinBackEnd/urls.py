@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from tickets.views import TicketView, loginview, PriorityView, CategoryView, StateView, UserView, TicketDetailView, signupview, UserDetailView
+from tickets.views import TicketView, loginview, PriorityView, CategoryView, StateView, UserView, TicketDetailView, signupview, UserDetailView, adduserview
 
 
 urlpatterns = [
@@ -14,4 +14,5 @@ urlpatterns = [
     path('state/', StateView.as_view()),
     path('user/', UserView.as_view()),
     path('user/<int:user_id>/', UserDetailView.as_view()),
+    path('adduser/', adduserview.as_view())
 ]
