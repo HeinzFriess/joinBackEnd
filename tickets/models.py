@@ -26,7 +26,7 @@ class Ticket(models.Model):
     priority = models.ForeignKey(Priority,on_delete=models.CASCADE)
     status = models.ForeignKey(State,on_delete=models.CASCADE)
     maintask = models.BooleanField(default=False)
-    subtasks = models.TextField(blank=True)
+    subtasks = models.JSONField(blank=True)
     assigned = models.CharField(max_length=100)
     date = models.DateField(default=datetime.date.today)
     author = models.ForeignKey(
