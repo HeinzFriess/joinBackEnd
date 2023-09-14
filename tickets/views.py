@@ -8,7 +8,9 @@ from django.contrib.auth.models import User
 from rest_framework import generics
 from tickets.models import Ticket, Category, Priority, State
 from tickets.serializers import TicketSerializer, CategorySerializer, StateSerializer, UsersSerializer, PrioritySerializer, SignupSerializer, UsersEditSerializer
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import authenticate
 
 
 class TicketView(APIView):
@@ -174,20 +176,36 @@ class StateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# class loginview(ObtainAuthToken):
+
+#     def post(self, request):  # , *args, **kwargs):
+#         serializer = self.serializer_class(data=request.data,
+#                                            context={'request': request})
+#         serializer.is_valid(raise_exception=True)
+#         user = serializer.validated_data['user']
+#         token, created = Token.objects.get_or_create(user=user)
+#         return Response({
+#             'token': token.key,
+#             'user_id': user.pk,
+#             'email': user.email
+#         })
+
+#@method_decorator(csrf_exempt, name='dispatch')
 class loginview(ObtainAuthToken):
-
-    def post(self, request):  # , *args, **kwargs):
-        serializer = self.serializer_class(data=request.data,
-                                           context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({
-            'token': token.key,
-            'user_id': user.pk,
-            'email': user.email
-        })
-
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        user = authenticate(request, username=email, password=password)
+        print(user)
+        if user is not None:
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({
+                'user_id': user.pk,
+                'token': token.key,
+                'email': user.email
+                })
+        else:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class signupview(generics.CreateAPIView):
     queryset = User.objects.all()
