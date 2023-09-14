@@ -31,6 +31,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'http://127.0.0.1:5500',
     'heinzjoin.pythonanywhere.com',
+    'https://heinzfriess.com/join/'
 ]
 
 
@@ -72,6 +73,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5500",
+    "https://heinzfriess.com/join/"
 ]
 
 CORS_ALLOW_ALL_ORIGINS: True
